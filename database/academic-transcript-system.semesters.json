@@ -1,0 +1,14 @@
+[{
+  "_id": {
+    "$oid": "67ca364f5ad38d2f0d9673cd"
+  },
+  "name": "First Semester",
+  "code": "1st SEM"
+},
+{
+  "_id": {
+    "$oid": "67ca367a5ad38d2f0d9673ce"
+  },
+  "name": "Second Semester",
+  "code": "2nd SEM"
+}]

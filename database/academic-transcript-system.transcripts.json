@@ -1,0 +1,177 @@
+[{
+  "_id": {
+    "$oid": "67ca3e3e5ad38d2f0d9673de"
+  },
+  "studentId": {
+    "$oid": "67ca3d815ad38d2f0d9673db"
+  },
+  "sessionId": {
+    "$oid": "67ca36f55ad38d2f0d9673d0"
+  },
+  "semesterId": {
+    "$oid": "67ca364f5ad38d2f0d9673cd"
+  },
+  "courses": [
+    {
+      "courseId": {
+        "$oid": "67ca374d5ad38d2f0d9673d2"
+      },
+      "score": 85,
+      "grade": "A",
+      "passFail": "Pass"
+    }
+  ],
+  "gpa": 5,
+  "transcriptHash": "f42d41318a96e9332c3a8e87fccdfd0e03a688d6e382dc870bbaa09640f13d62"
+},
+{
+  "_id": {
+    "$oid": "67ca3e555ad38d2f0d9673df"
+  },
+  "studentId": {
+    "$oid": "67ca3d985ad38d2f0d9673dc"
+  },
+  "sessionId": {
+    "$oid": "67ca36ab5ad38d2f0d9673cf"
+  },
+  "semesterId": {
+    "$oid": "67ca364f5ad38d2f0d9673cd"
+  },
+  "courses": [
+    {
+      "courseId": {
+        "$oid": "67ca39525ad38d2f0d9673d8"
+      },
+      "score": 85,
+      "grade": "A",
+      "passFail": "Pass"
+    }
+  ],
+  "gpa": 4,
+  "transcriptHash": ""
+},
+{
+  "_id": {
+    "$oid": "67ca5e9b56f1791e2f996a7a"
+  },
+  "studentId": {
+    "$oid": "67ca3ba75ad38d2f0d9673da"
+  },
+  "sessionId": {
+    "$oid": "67ca36ab5ad38d2f0d9673cf"
+  },
+  "semesterId": {
+    "$oid": "67ca367a5ad38d2f0d9673ce"
+  },
+  "courses": [
+    {
+      "courseId": {
+        "$oid": "67ca37355ad38d2f0d9673d1"
+      },
+      "score": 78,
+      "grade": "A",
+      "passFail": "Pass"
+    },
+    {
+      "courseId": {
+        "$oid": "67ca37355ad38d2f0d9673d1"
+      },
+      "score": 73,
+      "grade": "A",
+      "passFail": "Pass"
+    },
+    {
+      "courseId": {
+        "$oid": "67ca37355ad38d2f0d9673d1"
+      },
+      "score": 58,
+      "grade": "C",
+      "passFail": "Pass"
+    },
+    {
+      "courseId": {
+        "$oid": "67ca37355ad38d2f0d9673d1"
+      },
+      "score": 58,
+      "grade": "C",
+      "passFail": "Pass"
+    }
+  ],
+  "gpa": 4.45,
+  "transcriptHash": "cdfadb8363ee2b190796511a1ea6e1777c04a041da16c1a5a0068c6e96b709a2"
+},
+{
+  "_id": {
+    "$oid": "67ca3e2d5ad38d2f0d9673dd"
+  },
+  "studentId": {
+    "$oid": "67ca3ba75ad38d2f0d9673da"
+  },
+  "courses": {
+    "2021/2022": [
+      {
+        "courseId": {
+          "$oid": "67ca37355ad38d2f0d9673d1"
+        },
+        "semesterId": {
+          "$oid": "67ca364f5ad38d2f0d9673cd"
+        },
+        "score": 58,
+        "grade": "C",
+        "passFail": "Pass"
+      },
+      {
+        "courseId": {
+          "$oid": "67ca374d5ad38d2f0d9673d2"
+        },
+        "semesterId": {
+          "$oid": "67ca367a5ad38d2f0d9673ce"
+        },
+        "score": 75,
+        "grade": "A",
+        "passFail": "Pass"
+      }
+    ],
+    "2022/2023": [
+      {
+        "courseId": {
+          "$oid": "67ca37355ad38d2f0d9673d1"
+        },
+        "semesterId": {
+          "$oid": "67ca364f5ad38d2f0d9673cd"
+        },
+        "score": 62,
+        "grade": "B",
+        "passFail": "Pass"
+      }
+    ],
+    "2023/2024": [
+      {
+        "courseId": {
+          "$oid": "67ca374d5ad38d2f0d9673d2"
+        },
+        "semesterId": {
+          "$oid": "67ca367a5ad38d2f0d9673ce"
+        },
+        "score": 80,
+        "grade": "A",
+        "passFail": "Pass"
+      }
+    ],
+    "2024/2025": [
+      {
+        "courseId": {
+          "$oid": "67ca37355ad38d2f0d9673d1"
+        },
+        "semesterId": {
+          "$oid": "67ca364f5ad38d2f0d9673cd"
+        },
+        "score": 55,
+        "grade": "C",
+        "passFail": "Pass"
+      }
+    ]
+  },
+  "gpa": 3.45,
+  "transcriptHash": ""
+}]

@@ -1,0 +1,30 @@
+[{
+  "_id": {
+    "$oid": "67ca35ae5ad38d2f0d9673cb"
+  },
+  "name": "BSC Computer Science",
+  "code": "CSC",
+  "departmentId": {
+    "$oid": "67ca348a5ad38d2f0d9673c7"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ca35d65ad38d2f0d9673cc"
+  },
+  "name": "BA History & International Relations",
+  "code": "HIR",
+  "departmentId": {
+    "$oid": "67ca354f5ad38d2f0d9673ca"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ca38875ad38d2f0d9673d7"
+  },
+  "name": "BGS General Studies",
+  "code": "GST",
+  "departmentId": {
+    "$oid": "67ca38025ad38d2f0d9673d5"
+  }
+}]

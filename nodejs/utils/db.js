@@ -1,23 +1,28 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
+// Local MongoDB connection (default port)
+const LOCAL_URI = 'mongodb://127.0.0.1:27017/academic-transcript-system';
+
+// Use environment variable if available, otherwise local
+const MONGODB_URI = process.env.MONGODB_URI || LOCAL_URI;
+
 let client;
 let clientPromise;
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable so the client is not recreated on every hot reload
+if (process.env.NODE_ENV === 'development') 
+  {
+  // In development mode, using a global variable  preserves connection.
   if (!global._mongoClientPromise) {
-    client = new MongoClient(uri);
+    client = new MongoClient(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     global._mongoClientPromise = client.connect();
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  // In production mode, it's best to not use a global variable
-  client = new MongoClient(uri);
+  // But in production mode, I will create new connection.
+  client = new MongoClient(MONGODB_URI);
   clientPromise = client.connect();
 }
 

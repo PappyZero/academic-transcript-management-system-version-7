@@ -1,8 +1,10 @@
 import clientPromise from '../../utils/db';
 import { ObjectId } from 'mongodb';
 
-export default async function handler(req, res) {
-  try {
+export default async function handler(req, res) 
+{
+  try 
+  {
     const client = await clientPromise;
     const db = client.db('academic-transcript-system');
 
@@ -17,11 +19,13 @@ export default async function handler(req, res) {
     const semestersCollection = db.collection('semesters');
     const sessionsCollection = db.collection('sessions');
     const staffsCollection = db.collection('staffs');
+    const usersCollection = db.collection('users');
 
     // Fetch all students with basic info and latest transcript
     const students = await studentsCollection.aggregate([
       {
-        $lookup: {
+        $lookup: 
+        {
           from: "transcripts",
           let: { studentId: "$_id" },
           pipeline: [
@@ -33,6 +37,16 @@ export default async function handler(req, res) {
         }
       },
       { $unwind: { path: "$latestTranscript", preserveNullAndEmptyArrays: true } },
+      // Lookup course names
+      {
+        $lookup: {
+          from: "courses",
+          localField: "latestTranscript.courseIds",
+          foreignField: "_id",
+          as: "courseDetails"
+        }
+      },
+      { $unwind: { path: "$courseDetails", preserveNullAndEmptyArrays: true } },
       // Lookup faculty name
       {
         $lookup: {
@@ -72,6 +86,10 @@ export default async function handler(req, res) {
           faculty: "$facultyDetails.name",
           programme: "$programmeDetails.name",
           department: "$departmentDetails.name",
+          session: "$latestTranscript.sessionId",
+          semester: "$latestTranscript.semesterId",
+          courses: "$courseDetails.courseName",
+          grades: "$latestTranscript.grades",
           level: 1,
           latestGPA: "$latestTranscript.cumulativeGPA",
           transcriptHash: "$latestTranscript.transcriptHash"

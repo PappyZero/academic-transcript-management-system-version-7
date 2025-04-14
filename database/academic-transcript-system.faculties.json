@@ -1,0 +1,21 @@
+[{
+  "_id": {
+    "$oid": "67ca34d95ad38d2f0d9673c8"
+  },
+  "name": "Faculty of Science",
+  "code": "FOS"
+},
+{
+  "_id": {
+    "$oid": "67ca34fb5ad38d2f0d9673c9"
+  },
+  "name": "Faculty of Humanities",
+  "code": "FOH"
+},
+{
+  "_id": {
+    "$oid": "67ca38215ad38d2f0d9673d6"
+  },
+  "name": "Faculty of General Studies",
+  "code": "FOG"
+}]

@@ -1,0 +1,54 @@
+[{
+  "_id": {
+    "$oid": "67ca3ba75ad38d2f0d9673da"
+  },
+  "name": "Femi Sunday David",
+  "matricNumber": "VUG/GST/21/2108",
+  "departmentId": {
+    "$oid": "67ca38025ad38d2f0d9673d5"
+  },
+  "facultyId": {
+    "$oid": "67ca38215ad38d2f0d9673d6"
+  },
+  "programmeId": {
+    "$oid": "67ca38875ad38d2f0d9673d7"
+  },
+  "level": 100,
+  "walletAddress": "0xCaf7f93A612b2Eaa43fc45DA13b1D074073d5069"
+},
+{
+  "_id": {
+    "$oid": "67ca3d815ad38d2f0d9673db"
+  },
+  "name": "John Okafor James",
+  "matricNumber": "VUG/CSC/22/2201",
+  "departmentId": {
+    "$oid": "67ca348a5ad38d2f0d9673c7"
+  },
+  "facultyId": {
+    "$oid": "67ca34d95ad38d2f0d9673c8"
+  },
+  "programmeId": {
+    "$oid": "67ca35ae5ad38d2f0d9673cb"
+  },
+  "level": 200,
+  "walletAddress": "0x1234abcd5678efgh9012ijkl3456mnop7890abft"
+},
+{
+  "_id": {
+    "$oid": "67ca3d985ad38d2f0d9673dc"
+  },
+  "name": "Mary Silvester Anna",
+  "matricNumber": "VUG/HIR/21/2190",
+  "departmentId": {
+    "$oid": "67ca354f5ad38d2f0d9673ca"
+  },
+  "facultyId": {
+    "$oid": "67ca34fb5ad38d2f0d9673c9"
+  },
+  "programmeId": {
+    "$oid": "67ca35d65ad38d2f0d9673cc"
+  },
+  "level": 200,
+  "walletAddress": "0x1234abcd5678efgh9012ijkl3456mnop7890qrst"
+}]

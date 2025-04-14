@@ -1,0 +1,24 @@
+[{
+  "_id": {
+    "$oid": "67ca348a5ad38d2f0d9673c7"
+  },
+  "name": "Computer Science",
+  "code": "CSC",
+  "facultyId": "67ca34d95ad38d2f0d9673c8"
+},
+{
+  "_id": {
+    "$oid": "67ca354f5ad38d2f0d9673ca"
+  },
+  "name": "History & International Relations",
+  "code": "HIR",
+  "facultyId": "67ca34fb5ad38d2f0d9673c9"
+},
+{
+  "_id": {
+    "$oid": "67ca38025ad38d2f0d9673d5"
+  },
+  "name": "General Studies",
+  "code": "GST",
+  "facultyId": "67ca38215ad38d2f0d9673d6"
+}]

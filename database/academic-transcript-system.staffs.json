@@ -1,0 +1,39 @@
+[{
+  "_id": {
+    "$oid": "67ca3ac85ad38d2f0d9673d9"
+  },
+  "name": "Prof. Musa Ahmed",
+  "role": "Lecturer",
+  "departmentId": {
+    "$oid": "67ca348a5ad38d2f0d9673c7"
+  },
+  "facultyId": {
+    "$oid": "67ca34d95ad38d2f0d9673c8"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ca44865ad38d2f0d9673e0"
+  },
+  "name": "Prof. Amina Mohammed",
+  "role": "Lecturer",
+  "departmentId": {
+    "$oid": "67ca354f5ad38d2f0d9673ca"
+  },
+  "facultyId": {
+    "$oid": "67ca34fb5ad38d2f0d9673c9"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ca448e5ad38d2f0d9673e1"
+  },
+  "name": "Dr. John Adebayo",
+  "role": "Lecturer",
+  "departmentId": {
+    "$oid": "67ca38025ad38d2f0d9673d5"
+  },
+  "facultyId": {
+    "$oid": "67ca38215ad38d2f0d9673d6"
+  }
+}]

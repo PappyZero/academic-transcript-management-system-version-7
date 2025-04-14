@@ -1,5 +1,5 @@
 {
-  "name": "academic-transcript-web-dapp",
+  "name": "vuna_atms-version-3",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "iron-session": "^8.0.4",
     "jspdf": "^3.0.0",
     "mongodb": "^6.13.0",
+    "mongoose": "^8.13.2",
     "next": "14.2.24",
     "pdf-lib": "^1.17.1",
     "react": "18.2.0",

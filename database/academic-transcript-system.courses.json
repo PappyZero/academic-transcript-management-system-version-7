@@ -1,0 +1,70 @@
+[{
+  "_id": {
+    "$oid": "67ca37355ad38d2f0d9673d1"
+  },
+  "code": "GST111",
+  "title": "Communication in English",
+  "creditUnits": 2,
+  "departmentId": {
+    "$oid": "67ca38025ad38d2f0d9673d5"
+  },
+  "programmeId": {
+    "$oid": "67ca38875ad38d2f0d9673d7"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ca374d5ad38d2f0d9673d2"
+  },
+  "code": "CSC101",
+  "title": "Introduction to Programming",
+  "creditUnits": 3,
+  "departmentId": {
+    "$oid": "67ca348a5ad38d2f0d9673c7"
+  },
+  "programmeId": {
+    "$oid": "67ca35ae5ad38d2f0d9673cb"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ca39525ad38d2f0d9673d8"
+  },
+  "code": "HIR201",
+  "title": "Nigeria From 1000 - 1900",
+  "creditUnits": 2,
+  "departmentId": {
+    "$oid": "67ca354f5ad38d2f0d9673ca"
+  },
+  "programmeId": {
+    "$oid": "67ca35d65ad38d2f0d9673cc"
+  }
+},
+{
+  "_id": {
+    "$oid": "67e2ba58d71c49f7920f1f13"
+  },
+  "code": "GST112",
+  "title": "Use of English",
+  "creditUnits": 2,
+  "departmentId": {
+    "$oid": "67ca38025ad38d2f0d9673d5"
+  },
+  "programmeId": {
+    "$oid": "67ca38875ad38d2f0d9673d7"
+  }
+},
+{
+  "_id": {
+    "$oid": "67e2baa3d71c49f7920f1f14"
+  },
+  "code": "CSC102",
+  "title": "Principles to Programming",
+  "creditUnits": 3,
+  "departmentId": {
+    "$oid": "67ca348a5ad38d2f0d9673c7"
+  },
+  "programmeId": {
+    "$oid": "67ca35ae5ad38d2f0d9673cb"
+  }
+}]

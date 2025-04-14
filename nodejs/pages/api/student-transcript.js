@@ -65,19 +65,24 @@ export default async function handler(req, res) {
         }
       },
       {
-        $project: {
+        $project: 
+        {
           session: "$session.name",
           semester: "$semester.name",
           level: 1,
-          courses: {
-            $map: {
+          courses: 
+          {
+            $map: 
+            {
               input: "$courses",
               as: "course",
               in: {
-                $mergeObjects: [
+                $mergeObjects: 
+                [
                   "$$course",
                   {
-                    $arrayElemAt: [
+                    $arrayElemAt: 
+                    [
                       {
                         $filter: {
                           input: "$courseDetails",

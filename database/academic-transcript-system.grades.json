@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "67ca2ab84e4d28e0309a6773"
+  },
+  "grade": "A",
+  "points": 5,
+  "minScore": 70,
+  "maxScore": 100
+},
+{
+  "_id": {
+    "$oid": "67ca2ab84e4d28e0309a6774"
+  },
+  "grade": "B",
+  "points": 4,
+  "minScore": 60,
+  "maxScore": 69
+}]
