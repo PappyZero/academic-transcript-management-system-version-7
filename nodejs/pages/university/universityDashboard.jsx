@@ -44,7 +44,7 @@ export default function UniversityDashboard() {
     );
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute allowedRoles={['university']}>
       <div className="min-h-screen">
         <UniversityNavbar />
           {/* Background Decoration */}

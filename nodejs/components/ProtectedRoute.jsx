@@ -1,44 +1,65 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, allowedRoles }) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     const verifySession = async () => {
       try {
-        console.log('Verifying session...');
+        setIsLoading(true);
+        
+        // Fetch session data
         const res = await fetch('/api/university/session');
+        const data = await res.json();
 
-        // If the session check fails, redirect to the login page
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error('Session check failed:', errorData);
-          toast.error('Please login to access this page');
-          router.push('/university/universityLogin');
-          return;
+        // Handle unauthorized access
+        if (!res.ok || !allowedRoles.includes(data.user?.role)) {
+          throw new Error(
+            data.user?.role 
+              ? 'Insufficient permissions' 
+              : 'Please login to access this page'
+          );
         }
 
-        // If the session is valid, do nothing (allow access to the protected route)
-        const data = await res.json();
-        console.log('Session is valid:', data);
+        // If authorized, allow access
+        setIsAuthorized(true);
+        
       } catch (error) {
-        console.error('Error verifying session:', error);
-        toast.error('An error occurred while verifying your session. Please try again.');
-        router.push('/university/universityLogin');
+        // Handle errors and redirect
+        console.error('Access denied:', error);
+        toast.error(error.message);
+        
+        // Redirect based on current path
+        const redirectPath = router.asPath !== '/' ? `/home/home?redirect=${encodeURIComponent(router.asPath)}` : '/home/home';
+        router.push(redirectPath);
+        
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    // Call the session verification function
     verifySession();
+  }, [router, allowedRoles]);
 
-    // Cleanup function (optional, but good practice)
-    return () => {
-      // Any cleanup logic (if needed)
-    };
-  }, [router]); // Add `router` to the dependency array
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-lg">Checking permissions...</div>
+      </div>
+    );
+  }
 
-  // Render the children if the session is valid
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-lg">Redirecting...</div>
+      </div>
+    );
+  }
+
   return <>{children}</>;
 }

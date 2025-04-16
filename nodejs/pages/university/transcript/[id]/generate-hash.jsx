@@ -11,13 +11,62 @@ export default function GenerateHashPage() {
   const [loading, setLoading] = useState(true);
   const [studentInfo, setStudentInfo] = useState(null);
 
-  // Generate SHA-256 hash
+  // Generate consistent SHA-256 hash
   const generateHash = async (data) => {
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(JSON.stringify(data));
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    try {
+      // Normalize and sort all data
+      const normalizedData = {
+        studentInfo: {
+          name: data.studentInfo.name.trim(),
+          matricNumber: data.studentInfo.matricNumber.trim(),
+          walletAddress: data.studentInfo.walletAddress.toLowerCase().trim(),
+          faculty: data.studentInfo.faculty.trim(),
+          programme: data.studentInfo.programme.trim(),
+          department: data.studentInfo.department.trim(),
+          currentLevel: data.studentInfo.currentLevel
+        },
+        academicRecords: data.academicRecords
+          .sort((a, b) => a.session.localeCompare(b.session)) // Sort by session
+          .map(record => ({
+            session: record.session.trim(),
+            semester: record.semester.trim(),
+            level: record.level,
+            courses: record.courses
+              .sort((a, b) => a.courseCode.localeCompare(b.courseCode)) // Sort courses
+              .map(course => ({
+                courseCode: course.courseCode.trim(),
+                courseTitle: course.courseTitle.trim(),
+                credits: course.credits,
+                score: course.score,
+                grade: course.grade.trim(),
+                passFail: course.passFail.trim()
+              })),
+            semesterGPA: parseFloat(record.semesterGPA.toFixed(2))
+          })),
+        cumulativeGPA: parseFloat(data.cumulativeGPA.toFixed(2))
+      };
+
+      // Create deterministic JSON string
+      const deterministicString = JSON.stringify(normalizedData, (key, value) => {
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+          return Object.keys(value).sort().reduce((sorted, key) => {
+            sorted[key] = value[key];
+            return sorted;
+          }, {});
+        }
+        return value;
+      });
+
+      // Generate hash
+      const encoder = new TextEncoder();
+      const dataBuffer = encoder.encode(deterministicString);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (error) {
+      console.error('Hash generation error:', error);
+      throw new Error('Failed to generate consistent hash');
+    }
   };
 
   // Fetch transcript data and generate hash
@@ -33,19 +82,9 @@ export default function GenerateHashPage() {
       setHash(generatedHash);
       setLoading(false);
       
-      toast.success('Hash generated successfully!', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.success('Hash generated successfully!');
     } catch (error) {
-      toast.error(`Error: ${error.message}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error(`Error: ${error.message}`);
       setLoading(false);
     }
   };
@@ -64,23 +103,13 @@ export default function GenerateHashPage() {
         }),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to save hash');
+        throw new Error(await response.text());
       }
 
-      toast.success('✅ Hash saved successfully!', {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return result;
+      toast.success('✅ Hash saved successfully!');
     } catch (error) {
-      toast.error(`❌ Save failed: ${error.message}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      throw error;
+      toast.error(`❌ Save failed: ${error.message}`);
     }
   };
 
@@ -88,15 +117,9 @@ export default function GenerateHashPage() {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(hash);
-      toast.info('📋 Copied to clipboard!', {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      toast.info('📋 Copied to clipboard!');
     } catch (error) {
-      toast.error('❌ Failed to copy', {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error('❌ Failed to copy');
     }
   };
 
@@ -119,9 +142,8 @@ export default function GenerateHashPage() {
     <div className="min-h-screen flex flex-col">
       <UniversityNavbar />
       
-      <main className="flex-grow pt-20 p-6"> {/* Added pt-20 for navbar spacing */}
+      <main className="flex-grow pt-20 p-6">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-          {/* Centered heading inside the white card */}
           <h1 className="text-2xl font-bold mb-6 text-center text-black border-b pb-4">
             Transcript Hash Generation
           </h1>

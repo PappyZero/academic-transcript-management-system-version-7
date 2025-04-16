@@ -1,10 +1,9 @@
+// pages/api/db-api.js (full updated code)
 import clientPromise from '../../utils/db';
 import { ObjectId } from 'mongodb';
 
-export default async function handler(req, res) 
-{
-  try 
-  {
+export default async function handler(req, res) {
+  try {
     const client = await clientPromise;
     const db = client.db('academic-transcript-system');
 
@@ -18,14 +17,11 @@ export default async function handler(req, res)
     const programmesCollection = db.collection('programmes');
     const semestersCollection = db.collection('semesters');
     const sessionsCollection = db.collection('sessions');
-    const staffsCollection = db.collection('staffs');
-    const usersCollection = db.collection('users');
 
     // Fetch all students with basic info and latest transcript
     const students = await studentsCollection.aggregate([
       {
-        $lookup: 
-        {
+        $lookup: {
           from: "transcripts",
           let: { studentId: "$_id" },
           pipeline: [
@@ -41,12 +37,11 @@ export default async function handler(req, res)
       {
         $lookup: {
           from: "courses",
-          localField: "latestTranscript.courseIds",
+          localField: "latestTranscript.courses.courseId",
           foreignField: "_id",
           as: "courseDetails"
         }
       },
-      { $unwind: { path: "$courseDetails", preserveNullAndEmptyArrays: true } },
       // Lookup faculty name
       {
         $lookup: {
@@ -82,16 +77,16 @@ export default async function handler(req, res)
           _id: 1,
           name: 1,
           matricNumber: 1,
-          walletAddress: 1, // Include walletAddress
+          walletAddress: 1,
           faculty: "$facultyDetails.name",
           programme: "$programmeDetails.name",
           department: "$departmentDetails.name",
           session: "$latestTranscript.sessionId",
           semester: "$latestTranscript.semesterId",
-          courses: "$courseDetails.courseName",
+          courses: "$courseDetails.title", // Changed from courseName to title
           grades: "$latestTranscript.grades",
-          level: 1,
-          latestGPA: "$latestTranscript.cumulativeGPA",
+          level: 1, // Ensure this line exists
+          latestGPA: "$latestTranscript.gpa",
           transcriptHash: "$latestTranscript.transcriptHash"
         }
       }

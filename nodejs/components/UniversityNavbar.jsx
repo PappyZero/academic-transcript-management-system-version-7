@@ -35,6 +35,7 @@ export default function UniversityNavbar() {
         if (response.ok) {
           const data = await response.json();
           setUserAddress(data.user.address);
+          setUserRole(data.user.role); // Add this state
         }
       } catch (error) {
         console.error('Session check failed:', error);

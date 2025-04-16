@@ -139,3 +139,34 @@ html, body {
     display: none;
   }
 }
+
+/* For Transcript Display */
+/* styles/globals.css */
+#transcript {
+  background: white;
+  padding: 2rem;
+}
+
+.blob {
+  position: fixed;
+  background: rgba(16, 185, 129, 0.1);
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+}
+
+.top-right {
+  top: -200px;
+  right: -200px;
+}
+
+.top-left {
+  top: -200px;
+  left: -200px;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}

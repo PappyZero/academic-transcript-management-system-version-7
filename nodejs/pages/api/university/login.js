@@ -1,5 +1,6 @@
 import { createSession } from '../../../lib/session';
 import { ethers } from 'ethers';
+import clientPromise from '../../../utils/db';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -9,37 +10,60 @@ export default async function handler(req, res) {
   try {
     const { address, signature, message } = req.body;
 
-    console.log('Received Login Request:', { address, signature, message });
-
+    // Validate input
     if (!address || !ethers.isAddress(address)) {
-      console.error('Invalid wallet address:', address);
       return res.status(400).json({ error: 'Invalid wallet address' });
     }
 
-    const adminWallet = process.env.NEXT_PUBLIC_ADMIN_WALLET;
-    console.log('Admin Wallet:', adminWallet);
-
-    if (ethers.getAddress(address) !== ethers.getAddress(adminWallet)) {
-      console.error('Unauthorized wallet address:', address);
-      return res.status(401).json({ error: 'Unauthorized wallet address' });
-    }
-
-    // Verify the signature
+    // Verify signature
     const recoveredAddress = ethers.verifyMessage(message, signature);
     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-      console.error('Signature verification failed:', { recoveredAddress, address });
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
-    console.log('Signature verified successfully');
+    // Check database for authorized university user with case-insensitive match
+    const client = await clientPromise;
+    const db = client.db('academic-transcript-system');
+    const user = await db.collection('users').findOne({
+      "walletAddress": { 
+        "$regex": `^${ethers.getAddress(address)}$`, 
+        "$options": "i" 
+      },
+      "role": "university"
+    });
 
-    // Create the session
-    await createSession(res, address);
-    console.log('Session created successfully');
+    if (!user) {
+      return res.status(403).json({ 
+        error: 'Unauthorized - Not a registered university account' 
+      });
+    }
 
-    res.status(200).json({ success: true });
+    // Normalize address to checksum format
+    const normalizedAddress = ethers.getAddress(address);
+
+    // Create session with role information
+    await createSession(res, {
+      address: normalizedAddress,
+      role: user.role,
+      userId: user._id.toString(),
+      universityDetails: user.universityDetails // Include university info
+    });
+
+    res.status(200).json({ 
+      success: true,
+      user: {
+        address: normalizedAddress,
+        role: user.role,
+        name: user.universityDetails.name,
+        domain: user.universityDetails.domain
+      }
+    });
+
   } catch (error) {
     console.error('University login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
   }
 }
