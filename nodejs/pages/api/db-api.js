@@ -1,25 +1,14 @@
-// pages/api/db-api.js (full updated code)
-import clientPromise from '../../utils/db';
+// pages/api/db-api.js
+import { connectDB } from '../../utils/db';
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
   try {
-    const client = await clientPromise;
-    const db = client.db('academic-transcript-system');
+    // Use the connectDB utility properly
+    const { db } = await connectDB();
 
-    // Fetch all collections
-    const studentsCollection = db.collection('students');
-    const transcriptsCollection = db.collection('transcripts');
-    const coursesCollection = db.collection('courses');
-    const departmentsCollection = db.collection('departments');
-    const facultiesCollection = db.collection('faculties');
-    const gradesCollection = db.collection('grades');
-    const programmesCollection = db.collection('programmes');
-    const semestersCollection = db.collection('semesters');
-    const sessionsCollection = db.collection('sessions');
-
-    // Fetch all students with basic info and latest transcript
-    const students = await studentsCollection.aggregate([
+    // Fetch all students with basic info and latest transcript using direct db.collection
+    const students = await db.collection('students').aggregate([
       {
         $lookup: {
           from: "transcripts",
@@ -33,7 +22,6 @@ export default async function handler(req, res) {
         }
       },
       { $unwind: { path: "$latestTranscript", preserveNullAndEmptyArrays: true } },
-      // Lookup course names
       {
         $lookup: {
           from: "courses",
@@ -42,7 +30,6 @@ export default async function handler(req, res) {
           as: "courseDetails"
         }
       },
-      // Lookup faculty name
       {
         $lookup: {
           from: "faculties",
@@ -52,7 +39,6 @@ export default async function handler(req, res) {
         }
       },
       { $unwind: { path: "$facultyDetails", preserveNullAndEmptyArrays: true } },
-      // Lookup programme name
       {
         $lookup: {
           from: "programmes",
@@ -62,7 +48,6 @@ export default async function handler(req, res) {
         }
       },
       { $unwind: { path: "$programmeDetails", preserveNullAndEmptyArrays: true } },
-      // Lookup department name
       {
         $lookup: {
           from: "departments",
@@ -83,9 +68,9 @@ export default async function handler(req, res) {
           department: "$departmentDetails.name",
           session: "$latestTranscript.sessionId",
           semester: "$latestTranscript.semesterId",
-          courses: "$courseDetails.title", // Changed from courseName to title
+          courses: "$courseDetails.title",
           grades: "$latestTranscript.grades",
-          level: 1, // Ensure this line exists
+          level: 1,
           latestGPA: "$latestTranscript.gpa",
           transcriptHash: "$latestTranscript.transcriptHash"
         }
@@ -95,6 +80,10 @@ export default async function handler(req, res) {
     res.status(200).json({ students });
   } catch (error) {
     console.error('Error fetching data:', error);
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    res.status(500).json({ 
+      message: 'Internal Server Error',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }

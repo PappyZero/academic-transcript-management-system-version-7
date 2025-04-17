@@ -1,4 +1,4 @@
-import clientPromise from '../../utils/db';
+import { clientPromise } from '../../utils/db'; 
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     }
 
     const client = await clientPromise;
-    const db = client.db('academic-transcript-system');
+    const db = client.db("academic-transcript-system"); 
 
     // Convert to ObjectId and validate
     let objectId;

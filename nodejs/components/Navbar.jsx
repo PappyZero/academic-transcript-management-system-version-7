@@ -112,7 +112,7 @@ const Navbar = () => {
           </div>
 
           {/* Connect Wallet Button */}
-          <Link href="/home/home">
+          <Link href="/auth/signin">
             <button className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200">
               Connect Wallet
             </button>

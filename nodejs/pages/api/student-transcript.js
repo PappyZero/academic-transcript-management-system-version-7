@@ -1,37 +1,64 @@
-import clientPromise from '../../utils/db';
+import { connectDB } from '../../utils/db';
 import { ObjectId } from 'mongodb';
-import { getSession } from '../../lib/session';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./auth/[...nextauth]";
 
 const GRADE_POINTS = { 'A': 5.0, 'B': 4.0, 'C': 3.0, 'D': 2.0, 'F': 0.0 };
 
 export default async function handler(req, res) {
   try {
     const { id } = req.query;
-    if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
-      return res.status(400).json({ message: 'Invalid student ID' });
+
+    // Validate student ID format
+    if (!id || !ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid student ID format' });
     }
 
-    const session = await getSession(req);
-    if (!session) return res.status(401).json({ message: 'Unauthorized' });
-
-    const client = await clientPromise;
-    const db = client.db('academic-transcript-system');
-
-    // Fetch student document
-    const student = await db.collection('students').findOne({ 
-      _id: new ObjectId(id) 
-    });
-    if (!student) return res.status(404).json({ message: 'Student not found' });
-
-    // Authorization check
-    if (session.role === 'student' && 
-        student.walletAddress.toLowerCase() !== session.address.toLowerCase()) {
-      return res.status(403).json({ message: 'Access denied' });
+    // Get session using NextAuth
+    const session = await getServerSession(req, res, authOptions);
+    if (!session?.user) {
+      return res.status(401).json({ message: 'Unauthorized - Please log in' });
     }
 
-    // Main aggregation pipeline
-    const transcriptData = await db.collection('transcripts').aggregate([
-      { $match: { studentId: new ObjectId(id) } },
+    // Connect to MongoDB
+    const { db } = await connectDB(); // Correctly destructure `db` from `connectDB`
+
+    const studentId = new ObjectId(id);
+
+    // Fetch student document with access control
+    const student = await db.collection('students').findOne({ _id: studentId });
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Role-based access control
+    const { role, walletAddress } = session.user;
+
+    // University Access: Full access
+    const isUniversity = role === 'university';
+
+    // Student Access: Only their own records
+    const isStudentOwner = role === 'student' &&
+      student.walletAddress.toLowerCase() === walletAddress.toLowerCase();
+
+    // Verifier Access: Only shared transcripts
+    const isVerifierWithAccess = role === 'verifier' &&
+      await db.collection('shared_transcripts').findOne({
+        studentId: studentId,
+        verifierAddress: walletAddress.toLowerCase(),
+        status: 'approved'
+      });
+
+    if (!isUniversity && !isStudentOwner && !isVerifierWithAccess) {
+      return res.status(403).json({
+        message: 'Access denied - Insufficient permissions',
+        requiredAccess: 'Ownership, university role, or valid sharing agreement'
+      });
+    }
+
+    // Main aggregation pipeline with security filtering
+    const pipeline = [
+      { $match: { studentId: studentId } },
       {
         $lookup: {
           from: "sessions",
@@ -91,12 +118,16 @@ export default async function handler(req, res) {
           session: "$session.name",
           semester: "$semester.name",
           courses: 1,
-          transcriptHash: 1,
-          level: 1 // Include stored level from transcript
+          transcriptHash: isUniversity ? 1 : 0, // Only university sees hash
+          level: 1
         }
       },
       { $sort: { "session": 1 } }
-    ]).toArray();
+    ];
+
+    const transcriptData = await db.collection('transcripts')
+      .aggregate(pipeline)
+      .toArray();
 
     // GPA calculation logic
     let cumulativeQualityPoints = 0;
@@ -109,7 +140,7 @@ export default async function handler(req, res) {
       record.courses.forEach(course => {
         const credits = Number(course.creditUnits) || 0;
         const gradePoint = GRADE_POINTS[course.grade] || 0;
-        
+
         semesterQualityPoints += credits * gradePoint;
         semesterCredits += credits;
 
@@ -119,7 +150,7 @@ export default async function handler(req, res) {
         course.credits = credits;
       });
 
-      const semesterGPA = semesterCredits > 0 
+      const semesterGPA = semesterCredits > 0
         ? (semesterQualityPoints / semesterCredits)
         : 0;
 
@@ -128,7 +159,7 @@ export default async function handler(req, res) {
 
       return {
         ...record,
-        level: record.level, // Use stored level from transcript
+        level: record.level,
         semesterGPA: Number(semesterGPA.toFixed(2)),
         totalCredits: semesterCredits
       };
@@ -139,23 +170,39 @@ export default async function handler(req, res) {
       ? (cumulativeQualityPoints / cumulativeCredits)
       : 0;
 
+    // Build response based on role
     const response = {
       studentInfo: {
         name: student.name,
         matricNumber: student.matricNumber,
-        walletAddress: student.walletAddress,
+        walletAddress: isUniversity ? student.walletAddress : 'REDACTED',
         faculty: (await db.collection('faculties').findOne({ _id: student.facultyId }))?.name,
         programme: (await db.collection('programmes').findOne({ _id: student.programmeId }))?.name,
         department: (await db.collection('departments').findOne({ _id: student.departmentId }))?.name,
-        currentLevel: student.level // Current level from student document
+        currentLevel: student.level
       },
       academicRecords: processedRecords,
-      cumulativeGPA: Number(cumulativeGPA.toFixed(2))
+      cumulativeGPA: Number(cumulativeGPA.toFixed(2)),
+      verification: isVerifierWithAccess ? {
+        sharedBy: student.university,
+        sharedDate: isVerifierWithAccess.sharedDate,
+        expiration: isVerifierWithAccess.expiration
+      } : undefined
     };
 
+    // Remove sensitive info for non-university roles
+    if (!isUniversity) {
+      delete response.studentInfo.walletAddress;
+      response.academicRecords.forEach(record => delete record.transcriptHash);
+    }
+
     res.status(200).json(response);
+
   } catch (error) {
     console.error('Error fetching transcript:', error);
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }

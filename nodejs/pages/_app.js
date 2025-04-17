@@ -1,11 +1,11 @@
-// pages/_app.js
+import { SessionProvider } from 'next-auth/react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    <SessionProvider session={pageProps.session}>
       <Component {...pageProps} />
       <ToastContainer
         position="top-right"
@@ -18,9 +18,9 @@ function MyApp({ Component, pageProps }) {
         draggable
         pauseOnHover
         theme="colored"
-        style={{ top: '4rem' }} // Adjust this as needed
+        style={{ top: '4rem' }}
       />
-    </>
+    </SessionProvider>
   );
 }
 
