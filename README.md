@@ -34,8 +34,9 @@ A blockchain-based system for secure academic transcript management using Next.j
 1. **Clone the repository**
 ```
 bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/PappyZero/academic-transcript-management-system-version-7.git
+cd academic-transcript-management-system-version-7.git
+cd nodejs
 ```
 
 2. **Install dependencies**
@@ -47,6 +48,8 @@ npm install
 3. **Install Foundry (for smart contract development)**
 ```
 bash
+cd ..
+mkdir blockchain
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
