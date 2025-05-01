@@ -1,21 +1,20 @@
-import { clientPromise } from '../../utils/db'; 
+import { connectDB } from '@/utils/db'; 
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
+    // Connect to database
+    const { db } = await connectDB(); 
     const { studentId, hash } = req.body;
 
     // Validate input
     if (!studentId || !hash) {
       return res.status(400).json({ message: 'Missing studentId or hash' });
     }
-
-    const client = await clientPromise;
-    const db = client.db("academic-transcript-system"); 
 
     // Convert to ObjectId and validate
     let objectId;
