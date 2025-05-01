@@ -30,7 +30,7 @@ export default function Home({ children }) {
                   A secure and efficient platform for managing academic transcripts using blockchain technology.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                  <Link href="/home/home" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-lg">
+                  <Link href="/auth/signin" className="bg-gregit een-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-lg">
                     Explore ATMS
                   </Link>
                   <Link href="/learn-more" className="border-2 border-green-600 text-green-600 hover:bg-green-50 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200">

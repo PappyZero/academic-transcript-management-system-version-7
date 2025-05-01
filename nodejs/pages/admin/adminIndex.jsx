@@ -34,7 +34,7 @@ export default function AdminDashboard() {
           <thead>
             <tr className="bg-gray-200">
               <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Exam Officer's Address</th>
+              <th className="border border-gray-300 p-2">Academic Exam Officer's Address</th>
             </tr>
           </thead>
           <tbody>
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
               universities.map((uni) => (
                 <tr key={uni._id}>
                   <td className="border border-gray-300 p-2">{uni.name}</td>
-                  <td className="border border-gray-300 p-2">{uni.exam_officerAddress}</td>
+                  <td className="border border-gray-300 p-2">{uni.Academic_Exam_officerAddress}</td>
                 </tr>
               ))
             ) : (

@@ -4,60 +4,61 @@ import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import { connectDB } from "../../../utils/db";
 import { ethers } from "ethers";
 
+// Create a direct MongoDB client instance for the adapter
+const clientPromise = connectDB().then(({ client }) => client);
+
 export const authOptions = {
-  adapter: MongoDBAdapter({
-    db: async () => {
-      const { client, db } = await connectDB();
-      return { client, db }; // Adapter needs both client and db
-    },
-  }),
+  adapter: MongoDBAdapter(clientPromise),
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        walletAddress: { label: "Wallet Address", type: "text" },
+        address: { label: "Wallet Address", type: "text" },
+        signature: { label: "Signature", type: "text" },
         role: { label: "Role", type: "text" },
+        nonce: { label: "Nonce", type: "text" }
       },
       async authorize(credentials) {
         try {
           const { db } = await connectDB();
 
-          console.log("Received Credentials:", credentials); // Debugging log
+          // Verify signature
+          const message = `Welcome to ATMS!\n\nSign in as ${credentials.role}\nNonce: ${credentials.nonce}`;
+          const verifiedAddress = ethers.verifyMessage(message, credentials.signature);
 
-          // Validate wallet address format
-          if (!ethers.isAddress(credentials.walletAddress)) {
-            throw new Error("Invalid wallet address format");
+          // Validate address matches
+          if (verifiedAddress.toLowerCase() !== credentials.address.toLowerCase()) {
+            throw new Error("Address doesn't match signature");
           }
 
-          // Normalize wallet address
-          const normalizedAddress = ethers.getAddress(credentials.walletAddress);
-          console.log("Normalized Address:", normalizedAddress); // Debugging log
+          // Validate nonce
+          const nonceDoc = await db.collection('nonces').findOne({ 
+            address: verifiedAddress,
+            nonce: credentials.nonce
+          });
 
-          // Find user with role-specific details
-          const user = await db.collection("users").findOne(
-            {
-              walletAddress: normalizedAddress,
-              role: credentials.role,
-            },
-            {
-              projection: {
-                _id: 1,
-                role: 1,
-                walletAddress: 1,
-                universityDetails: 1,
-                studentDetails: 1,
-                verifierDetails: 1,
-              },
-            }
-          );
-
-          if (!user) {
-            throw new Error("Account not found for this role");
+          if (!nonceDoc) {
+            throw new Error("Invalid or expired nonce");
           }
 
-          console.log("Authenticated User:", user); // Debugging log
+          // Check nonce expiration
+          if (new Date() > nonceDoc.expiresAt) {
+            await db.collection('nonces').deleteOne({ _id: nonceDoc._id });
+            throw new Error("Nonce has expired");
+          }
 
-          // Role-specific data enrichment
+          // Cleanup used nonce
+          await db.collection('nonces').deleteOne({ _id: nonceDoc._id });
+
+          // Find user
+          const user = await db.collection("users").findOne({
+            walletAddress: verifiedAddress,
+            role: credentials.role
+          });
+
+          if (!user) throw new Error("Account not found for this role");
+
+          // Return user data with role-specific details
           let userData = {
             id: user._id.toString(),
             role: user.role,
@@ -108,8 +109,9 @@ export const authOptions = {
           }
 
           return userData;
+
         } catch (error) {
-          console.error("Authentication error:", error); // Debugging log
+          console.error("Authentication error:", error);
           throw new Error(error.message || "Authentication failed");
         }
       },
@@ -127,16 +129,19 @@ export const authOptions = {
           case "university":
             token.universityId = user.universityId;
             token.institution = user.institution;
+            token.permissions = user.permissions;
             break;
 
           case "student":
             token.studentId = user.studentId;
             token.matricNumber = user.matricNumber;
+            token.permissions = user.permissions;
             break;
 
           case "verifier":
             token.verifierId = user.verifierId;
             token.organization = user.organization;
+            token.permissions = user.permissions;
             break;
         }
       }
@@ -147,7 +152,7 @@ export const authOptions = {
         id: token.userId,
         role: token.role,
         walletAddress: token.walletAddress,
-        permissions: token.permissions // Add this line
+        permissions: token.permissions
       };
 
       // Add role-specific session data
@@ -177,6 +182,7 @@ export const authOptions = {
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
+    signOut: "/auth/signout"
   },
   session: {
     strategy: "jwt",
@@ -193,6 +199,19 @@ export const authOptions = {
     },
     debug(code, metadata) {
       console.debug(code, metadata);
+    },
+  },
+  debug: process.env.NODE_ENV === "development",
+  useSecureCookies: process.env.NODE_ENV === "production",
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
   },
 };

@@ -70,7 +70,7 @@ export default function UniversityRegister() {
               />
               <input
                 type="text"
-                placeholder="Exam Officer's Wallet Address"
+                placeholder="Academic Exam Officer's Wallet Address"
                 required
                 className="w-full p-3 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-green-500 border border-gray-700"
                 onChange={(e) => setFormData({ ...formData, walletAddress: e.target.value })}

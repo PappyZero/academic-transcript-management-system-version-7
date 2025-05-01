@@ -27,7 +27,7 @@ export default function ManageUniversity() {
         <thead>
           <tr className="bg-gray-100">
             <th className="py-2 px-4 border">University Name</th>
-            <th className="py-2 px-4 border">Exam Officer Address</th>
+            <th className="py-2 px-4 border">Academic Exam Officer Address</th>
             <th className="py-2 px-4 border">Actions</th>
           </tr>
         </thead>
@@ -35,7 +35,7 @@ export default function ManageUniversity() {
           {Array.isArray(pendingUniversities) && pendingUniversities.map((uni) => (
             <tr key={uni._id}>
               <td className="border border-gray-300 p-2">{uni.name}</td>
-              <td className="border border-gray-300 p-2">{uni.exam_officerAddress}</td>
+              <td className="border border-gray-300 p-2">{uni.Academic_Exam_officerAddress}</td>
               <td className="border border-gray-300 p-2">
                 <button className="bg-green-500 text-white px-4 py-2 rounded">Approve</button>
                 <button className="bg-red-500 text-white px-4 py-2 rounded ml-2">Reject</button>

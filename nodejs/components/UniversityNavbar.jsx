@@ -17,7 +17,7 @@ export default function UniversityNavbar() {
         callbackUrl: '/'
       });
       localStorage.clear();
-      window.location.href = '/';
+      window.location.href = '/auth/signin';
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -61,7 +61,7 @@ export default function UniversityNavbar() {
                   Dashboard
                 </span>
               </Link>
-              <Link href="/about-us/about-us">
+              {/* <Link href="/about-us/about-us">
                 <span className="text-white hover:bg-gradient-to-r from-green-300 to-green-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 border-b-2 border-green-500 bg-green bg-opacity-75 cursor-pointer">
                   About Us
                 </span>
@@ -70,10 +70,15 @@ export default function UniversityNavbar() {
                 <span className="text-white hover:bg-gradient-to-r from-green-300 to-green-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 border-b-2 border-green-500 bg-green bg-opacity-75 cursor-pointer">
                   Contact Us
                 </span>
-              </Link>
+              </Link> */}
               <Link href="/university/upload-transcript">
                 <span className="text-white hover:bg-gradient-to-r from-green-300 to-green-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 border-b-2 border-green-500 bg-green bg-opacity-75 cursor-pointer">
                   Upload Transcript
+                </span>
+              </Link>
+              <Link href="/university/upload-transcript">
+                <span className="text-white hover:bg-gradient-to-r from-green-300 to-green-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 border-b-2 border-green-500 bg-green bg-opacity-75 cursor-pointer">
+                Transcript Share Request 
                 </span>
               </Link>
             </div>

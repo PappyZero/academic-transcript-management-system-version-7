@@ -6,6 +6,13 @@ import { ethers } from 'ethers';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
+// Define redirectMap outside the component
+const redirectMap = {
+  university: "/university/universityDashboard",
+  student: "/student/studentDashboard",
+  verifier: "/verifier/verifierDashboard"
+};
+
 export default function SignInPage() {
   const [selectedRole, setSelectedRole] = useState('university');
   const [isConnecting, setIsConnecting] = useState(false);
@@ -15,31 +22,47 @@ export default function SignInPage() {
     setIsConnecting(true);
     try {
       if (!window.ethereum) throw new Error("Install MetaMask");
-  
+
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      const address = ethers.getAddress(accounts[0]); // Normalize the address
-  
-      console.log("Wallet Address:", address); // Debugging log
-  
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+
+      // Get nonce from server
+      const nonceResponse = await fetch('/api/auth/nonce', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address }),
+      });
+
+      if (!nonceResponse.ok) throw new Error('Failed to get nonce');
+      const { nonce } = await nonceResponse.json();
+
+      // Request signature from user
+      const signature = await signer.signMessage(
+        `Welcome to ATMS!\n\nSign in as ${selectedRole}\nNonce: ${nonce}`
+      );
+
+      // Send credentials to NextAuth
       const result = await signIn("credentials", {
         redirect: false,
-        walletAddress: address,
+        address,
+        signature,
         role: selectedRole,
+        nonce,
+        callbackUrl: redirectMap[selectedRole]
       });
-  
+
       if (result?.error) throw new Error(result.error);
-  
-      const redirectMap = {
-        university: "/university/universityDashboard",
-        student: "/student/studentDashboard",
-        verifier: "/verifier/verifierDashboard",
-      };
-  
-      router.push(redirectMap[selectedRole]);
+      
+      if (result?.url) {
+        router.push(result.url);
+      } else {
+        router.push(redirectMap[selectedRole]);
+      }
+      
       toast.success(`Signed in as ${selectedRole}`);
     } catch (error) {
-      console.error("Sign-in error:", error); // Debugging log
+      console.error("Sign-in error:", error);
       toast.error(error.message);
     } finally {
       setIsConnecting(false);
@@ -49,10 +72,9 @@ export default function SignInPage() {
   return (
     <div className="relative min-h-screen flex flex-col">
       <Navbar />
-      {/* Blob Background Decorations */}
       <div className="blob top-right"></div>
       <div className="blob top-left animation-delay-2000"></div>
-      
+
       <div className="flex-grow flex flex-col items-center justify-center p-4 z-10">
         <div className="w-full max-w-md bg-gray-900 rounded-xl shadow-2xl p-8 border border-gray-800">
           <div className="text-center mb-8 p-8 rounded-xl w-96">
@@ -80,7 +102,7 @@ export default function SignInPage() {
                 className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg font-medium py-3 rounded-lg
                           disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                {isConnecting ? 'Signing Message...' : 'Connect Wallet'}
               </button>
 
               <div className="mt-4 text-center">
@@ -105,10 +127,17 @@ export default function SignInPage() {
                   <p className="text-gray-400 text-sm">Verified organizations can validate documents</p>
                 )}
               </div>
+
+              <div className="mt-4 text-center">
+                <p className="text-green-400 text-sm">
+                  You'll be asked to sign a message in MetaMask to verify ownership
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
